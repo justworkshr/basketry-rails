@@ -63,7 +63,13 @@ class Builder {
   }
   private buildRouterFile(): File {
     return {
-      path: ['config', 'routes', `${snake(this.service.title.value)}.rb`],
+      path: [
+        'config',
+        'routes',
+        `${snake(this.service.title.value)}_v${
+          this.service.majorVersion.value
+        }.rb`,
+      ],
       contents: from(this.buildRouter()),
     };
   }

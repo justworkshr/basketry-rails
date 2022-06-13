@@ -1,4 +1,4 @@
-config/routes/basketry_example.rb linguist-generated=true
+config/routes/basketry_example_v1.rb linguist-generated=true
 app/controllers/basketry_example/gizmos_controller.rb linguist-generated=true
 app/controllers/basketry_example/widgets_controller.rb linguist-generated=true
 app/controllers/basketry_example/exhaustives_controller.rb linguist-generated=true

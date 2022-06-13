@@ -49,7 +49,7 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "@basketry/sorbet": "^0.0.11",
+    "@basketry/sorbet": "^0.0.13",
     "basketry": "^0.0.25",
     "case": "^1.6.3",
     "pluralize": "^8.0.0",

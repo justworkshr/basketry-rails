@@ -8,24 +8,24 @@ import {
 } from 'basketry';
 import { pascal, snake } from 'case';
 
-import { SorbetOptions } from '@basketry/sorbet/lib/types';
 import {
   buildEnumNamespace,
   buildNamespace,
   buildTypeNamespace,
 } from '@basketry/sorbet/lib/name-factory';
+import { RailsOptions } from './types';
 
 export function buildFullyQualifiedType(
   type: Type,
   service: Service,
-  options?: SorbetOptions,
+  options?: RailsOptions,
 ): string {
   return `${buildTypeNamespace(service, options)}::${pascal(type.name.value)}`;
 }
 
 export function buildFullyQualifiedValidationErrorType(
   service: Service,
-  options?: SorbetOptions,
+  options?: RailsOptions,
 ): string {
   return `${buildValidationErrorNamespace(
     service,
@@ -37,13 +37,13 @@ export function buildValidationErrorName(): string {
 }
 export function buildValidationErrorNamespace(
   service: Service,
-  options?: SorbetOptions,
+  options?: RailsOptions,
 ): string {
   return buildNamespace(options?.sorbet?.typesModule, service, options);
 }
 export function buildValidationErrorFilepath(
   service: Service,
-  options?: SorbetOptions,
+  options?: RailsOptions,
 ): string[] {
   const namespace = buildValidationErrorNamespace(service, options);
 
@@ -58,13 +58,13 @@ export function buildValidatorsName(): string {
 }
 export function buildValidatorsNamespace(
   service: Service,
-  options?: SorbetOptions,
+  options?: RailsOptions,
 ): string {
   return buildNamespace(options?.sorbet?.interfacesModule, service, options);
 }
 export function buildValidatorsFilepath(
   service: Service,
-  options?: SorbetOptions,
+  options?: RailsOptions,
 ): string[] {
   const namespace = buildValidatorsNamespace(service, options);
 

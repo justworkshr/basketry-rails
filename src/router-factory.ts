@@ -12,8 +12,6 @@ import {
   allParameters,
   getTypeByName,
   Type,
-  Property,
-  TypedValue,
   Enum,
 } from 'basketry';
 import { pascal, sentence, snake } from 'case';
@@ -21,34 +19,22 @@ import { plural } from 'pluralize';
 
 import { block, from, indent } from './utils';
 
-import { SorbetOptions } from '@basketry/sorbet/lib/types';
-
 import {
   buildInterfaceName,
   buildPropertyName,
   buildTypeName,
-  buildTypeNamespace,
 } from '@basketry/sorbet/lib/name-factory';
 import { warning } from '@basketry/sorbet/lib/warning';
+import { RailsOptions } from './types';
 
-export type SorbetRailsOptions = Omit<SorbetOptions, 'sorbet'> & {
-  sorbet?: SorbetOptions['sorbet'] & {
-    magicComments?: string[];
-    baseController?: string;
-  };
-};
-
-export const generateTypes: Generator = (
-  service,
-  options?: SorbetRailsOptions,
-) => {
+export const generateTypes: Generator = (service, options?: RailsOptions) => {
   return new Builder(service, options).build();
 };
 
 class Builder {
   constructor(
     private readonly service: Service,
-    private readonly options?: SorbetRailsOptions,
+    private readonly options?: RailsOptions,
   ) {}
 
   private readonly castPrimitive = new Set<Primitive>();

@@ -12,7 +12,7 @@
 
 module BasketryExample
   class WidgetsController < ActionController::Base
-    include ControllerHelpers
+    include BasketryExample::ControllerHelpers
 
     def get_widgets
       response = widget_service.get_widgets(

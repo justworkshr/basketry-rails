@@ -12,7 +12,7 @@
 
 module BasketryExample
   class ExhaustivesController < ActionController::Base
-    include ControllerHelpers
+    include BasketryExample::ControllerHelpers
 
     def exhaustive_formats
       response = exhaustive_service.exhaustive_formats(

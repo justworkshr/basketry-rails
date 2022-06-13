@@ -12,7 +12,7 @@
 
 module BasketryExample
   class GizmosController < ActionController::Base
-    include ControllerHelpers
+    include BasketryExample::ControllerHelpers
 
     def get_gizmos
       response = gizmo_service.get_gizmos(

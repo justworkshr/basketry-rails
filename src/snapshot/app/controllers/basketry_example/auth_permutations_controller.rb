@@ -12,7 +12,7 @@
 
 module BasketryExample
   class AuthPermutationsController < ActionController::Base
-    include ControllerHelpers
+    include BasketryExample::ControllerHelpers
 
     def all_auth_schemes
       response = auth_permutation_service.all_auth_schemes(

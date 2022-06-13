@@ -385,27 +385,26 @@ class Builder {
       yield '';
     }
 
-    const versionModule = self.options?.sorbet?.includeVersion
-      ? `::V${this.service.majorVersion.value}`
-      : '';
+    const versionedModule = `${pascal(this.service.title.value)}${
+      self.options?.sorbet?.includeVersion
+        ? `::V${this.service.majorVersion.value}`
+        : ''
+    }`;
 
-    yield* block(
-      `module ${pascal(this.service.title.value)}${versionModule}`,
-      function* () {
-        yield* block(
-          `class ${pascal(plural(int.name))}Controller < ${
-            self.options?.sorbet?.baseController || 'ActionController::Base'
-          }`,
-          function* () {
-            yield 'include ControllerHelpers';
-            for (const method of int.methods) {
-              yield '';
-              yield* self.buildControllerMethod(method, int);
-            }
-          },
-        );
-      },
-    );
+    yield* block(`module ${versionedModule}`, function* () {
+      yield* block(
+        `class ${pascal(plural(int.name))}Controller < ${
+          self.options?.sorbet?.baseController || 'ActionController::Base'
+        }`,
+        function* () {
+          yield `include ${versionedModule}::ControllerHelpers`;
+          for (const method of int.methods) {
+            yield '';
+            yield* self.buildControllerMethod(method, int);
+          }
+        },
+      );
+    });
 
     yield '';
   }

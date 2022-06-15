@@ -15,17 +15,17 @@ module BasketryExample
     include BasketryExample::ControllerHelpers
 
     def all_auth_schemes
-      response = auth_permutation_service.all_auth_schemes(
+      response = services.auth_permutation_service.all_auth_schemes(
       )
 
-      render status: get_status_code(response)
+      render status: response.errors.any? ? status_code(response.errors) : 200
     end
 
     def combo_auth_schemes
-      response = auth_permutation_service.combo_auth_schemes(
+      response = services.auth_permutation_service.combo_auth_schemes(
       )
 
-      render status: get_status_code(response)
+      render status: response.errors.any? ? status_code(response.errors) : 200
     end
   end
 end

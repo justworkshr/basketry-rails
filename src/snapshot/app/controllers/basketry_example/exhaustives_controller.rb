@@ -15,7 +15,7 @@ module BasketryExample
     include BasketryExample::ControllerHelpers
 
     def exhaustive_formats
-      response = exhaustive_service.exhaustive_formats(
+      response = services.exhaustive_service.exhaustive_formats(
         string_no_format: params['string-no-format'],
         string_date: cast_date(params['string-date']),
         string_date_time: cast_date_time(params['string-date-time']),
@@ -27,11 +27,11 @@ module BasketryExample
         number_double: cast_double(params['number-double'])
       )
 
-      render status: get_status_code(response)
+      render status: response.errors.any? ? status_code(response.errors) : 204
     end
 
     def exhaustive_params
-      response = exhaustive_service.exhaustive_params(
+      response = services.exhaustive_service.exhaustive_params(
         query_string: params['query-string'],
         query_enum: params['query-enum'],
         query_number: cast_number(params['query-number']),
@@ -65,7 +65,7 @@ module BasketryExample
         body: map_dto_to_exhaustive_params_body(JSON.parse(request.body.read))
       )
 
-      render status: get_status_code(response)
+      render status: response.errors.any? ? status_code(response.errors) : 204
     end
   end
 end

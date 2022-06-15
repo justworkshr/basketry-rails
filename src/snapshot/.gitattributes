@@ -4,3 +4,4 @@ app/controllers/basketry_example/widgets_controller.rb linguist-generated=true
 app/controllers/basketry_example/exhaustives_controller.rb linguist-generated=true
 app/controllers/basketry_example/auth_permutations_controller.rb linguist-generated=true
 app/controllers/basketry_example/controller_helpers.rb linguist-generated=true
+app/controllers/basketry_example/base_controller_interface.rb linguist-generated=true

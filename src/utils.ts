@@ -35,4 +35,9 @@ function iter(lines: Lines) {
 
   return typeof lines === 'function' ? arr(lines()) : arr(lines);
 }
+
+export function* comment(lines: Lines): Iterable<string> {
+  for (const line of iter(lines)) {
+    yield line.length ? `# ${line}` : '#';
+  }
 }

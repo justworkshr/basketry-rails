@@ -11,17 +11,23 @@ import {
   HttpParameter,
   allParameters,
   getTypeByName,
+  ReturnType,
   Type,
   Enum,
+  allMethods,
+  HttpMethod,
 } from 'basketry';
 import { pascal, sentence, snake } from 'case';
 import { plural } from 'pluralize';
 
-import { block, from, indent } from './utils';
+import { block, comment, from, indent } from './utils';
 
 import {
   buildInterfaceName,
+  buildInterfaceNamespace,
   buildPropertyName,
+  buildServiceLocatorName,
+  buildServiceLocatorNamespace,
   buildTypeName,
 } from '@basketry/sorbet/lib/name-factory';
 import { warning } from '@basketry/sorbet/lib/warning';
@@ -45,6 +51,7 @@ class Builder {
       this.buildRouterFile(),
       ...this.service.interfaces.map((int) => this.buildControllerFile(int)),
       this.buildHelperFile(),
+      this.buildBaseControllerInterfaceFile(),
     ];
   }
   private buildRouterFile(): File {
@@ -385,8 +392,10 @@ class Builder {
         function* () {
           yield `include ${versionedModule}::ControllerHelpers`;
           for (const method of int.methods) {
+            const httpMethod = getHttpMethod(self.service, method.name.value);
+            if (!httpMethod) continue;
             yield '';
-            yield* self.buildControllerMethod(method, int);
+            yield* self.buildControllerMethod(method, httpMethod, int);
           }
         },
       );
@@ -397,12 +406,15 @@ class Builder {
 
   private *buildControllerMethod(
     method: Method,
+    httpMethod: HttpMethod,
     int: Interface,
   ): Iterable<string> {
     const self = this;
     const methodName = snake(method.name.value);
     yield* block(`def ${methodName}`, function* () {
-      yield `response = ${snake(buildInterfaceName(int))}.${methodName}(`;
+      yield `response = services.${snake(
+        buildInterfaceName(int),
+      )}.${methodName}(`;
       yield* indent(
         method.parameters.map(
           (param, i) =>
@@ -419,7 +431,7 @@ class Builder {
             method.returnType.typeName.value,
           )}_to_dto(response), `
         : '';
-      yield `render ${json}status: get_status_code(response)`;
+      yield `render ${json}status: response.errors.any? ? status_code(response.errors) : ${httpMethod.successCode.value}`;
     });
   }
 
@@ -465,6 +477,131 @@ class Builder {
     } else {
       return `${p}`;
     }
+  }
+
+  private buildBaseControllerInterfaceFile(): File {
+    return {
+      path: [
+        'app',
+        'controllers',
+        snake(this.service.title.value),
+        this.options?.sorbet?.includeVersion
+          ? `v${this.service.majorVersion.value}`
+          : undefined,
+        `base_controller_interface.rb`,
+      ].filter((x): x is string => typeof x === 'string'),
+      contents: from(this.buildBaseControllerInterface()),
+    };
+  }
+
+  private *buildBaseControllerInterface(): Iterable<string> {
+    const self = this;
+    yield warning(this.service, require('../package.json'));
+    yield '';
+
+    if (this.options?.sorbet?.magicComments?.length) {
+      for (const magicComment of this.options.sorbet.magicComments) {
+        yield `# ${magicComment}`;
+      }
+      yield '';
+    }
+
+    yield '# typed: strict';
+    yield '';
+
+    const names = Array.from(
+      new Set(
+        allMethods(this.service, '', this.options)
+          .map((m) => m.method.returnType)
+          .filter((r): r is ReturnType => !!r)
+          .map((r) => getTypeByName(this.service, r.typeName.value))
+          .filter((t): t is Type => !!t)
+          .map(
+            (t) =>
+              t.properties.find(
+                (p) => p.isArray && p.name.value.toLowerCase() === 'errors',
+              )?.typeName?.value,
+          )
+          .filter((n): n is string => !!n),
+      ),
+    )
+      .map((n) => {
+        const type = getTypeByName(this.service, n);
+
+        return type
+          ? buildTypeName({
+              type: {
+                typeName: type.name,
+                isArray: false,
+                isPrimitive: false,
+                rules: [],
+              },
+              service: this.service,
+              options: this.options,
+              skipArrayify: true,
+            })
+          : undefined;
+      })
+      .filter((n): n is string => !!n);
+
+    const errorType =
+      names.length === 1 ? names[0] : `T.any(${names.join(', ')})`;
+
+    const versionedModule = `${pascal(this.service.title.value)}${
+      self.options?.sorbet?.includeVersion
+        ? `::V${this.service.majorVersion.value}`
+        : ''
+    }`;
+    const interfaceName = 'BaseControllerInterface';
+    yield* block(`module ${versionedModule}`, function* () {
+      yield* block(`module ${interfaceName}`, function* () {
+        yield `extend T::Sig`;
+        yield `extend T::Helpers`;
+        yield '';
+        yield 'interface!';
+        yield '';
+        yield `sig { abstract.returns(${buildServiceLocatorNamespace(
+          self.service,
+          self.options,
+        )}::${buildServiceLocatorName()}) }`;
+        yield 'def services';
+        yield 'end';
+        yield '';
+        yield `sig { abstract.params(errors: T::Array[${errorType}]).returns(Integer) }`;
+        yield 'def status_code(errors)';
+        yield 'end';
+      });
+    });
+
+    yield '';
+    yield `# The following template can be used to create an implementation of ${interfaceName}.`;
+    yield `# Note that if the original service definition is updated, this template may also be`;
+    yield `# updated; however, your implementation will remain as-is. In such a case, you will need`;
+    yield `# to manually update your implementation to match the ${interfaceName} interface.`;
+    yield '';
+
+    yield* comment(function* () {
+      yield* block(`module TemplateBaseController`, function* () {
+        yield `extend T::Sig`;
+        yield '';
+        yield `include ${versionedModule}::${interfaceName}`;
+        yield '';
+        yield `sig { override.returns(${buildServiceLocatorNamespace(
+          self.service,
+          self.options,
+        )}::${buildServiceLocatorName()}) }`;
+        yield 'def services';
+        yield* indent('raise NotImplementedError');
+        yield 'end';
+        yield '';
+        yield `sig { override.params(errors: T::Array[${errorType}]).returns(Integer) }`;
+        yield 'def status_code(errors)';
+        yield* indent('raise NotImplementedError');
+        yield 'end';
+      });
+    });
+
+    yield '';
   }
 }
 
@@ -573,4 +710,25 @@ function getHttpParameter(
   }
 
   return httpParameterCache.get(service)!.get(key(methodName, parameterName));
+}
+
+// TODO: move to basketry
+const httpMethodCache = new WeakMap<Service, Map<string, HttpMethod>>();
+function getHttpMethod(
+  service: Service,
+  methodName: string,
+): HttpMethod | undefined {
+  const key = (m: string, p: string): string => `${snake(m)}|||${snake(p)}`;
+
+  if (!httpMethodCache.has(service)) {
+    const map = new Map<string, HttpMethod>();
+
+    for (const { method, httpMethod } of allMethods(service, '', undefined)) {
+      if (!httpMethod) continue;
+      map.set(key(method.name.value, httpMethod.name.value), httpMethod);
+    }
+    httpMethodCache.set(service, map);
+  }
+
+  return httpMethodCache.get(service)!.get(key(methodName, methodName));
 }

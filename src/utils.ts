@@ -4,22 +4,21 @@ export function from(lines: Iterable<string>): string {
 
 let indentCount = 0;
 
-export function* block(
-  line: string,
-  body: string | Iterable<string> | (() => string | Iterable<string>),
-): Iterable<string> {
+export type Lines =
+  | string
+  | Iterable<string>
+  | (() => string | Iterable<string>);
+
+export function* block(line: string, body: Lines): Iterable<string> {
   yield line;
   yield* indent(body);
   yield 'end';
 }
 
-export function* indent(
-  lines: string | Iterable<string> | (() => string | Iterable<string>),
-): Iterable<string> {
+export function* indent(lines: Lines): Iterable<string> {
   try {
     indentCount++;
-    const x = typeof lines === 'function' ? iter(lines()) : iter(lines);
-    for (const line of x) {
+    for (const line of iter(lines)) {
       yield line.trim().length
         ? `${'  '.repeat(indentCount)}${line.trim()}`
         : '';
@@ -29,6 +28,11 @@ export function* indent(
   }
 }
 
-function iter(value: string | Iterable<string>): Iterable<string> {
-  return typeof value === 'string' ? [value] : value;
+function iter(lines: Lines) {
+  function arr(value: string | Iterable<string>): Iterable<string> {
+    return typeof value === 'string' ? [value] : value;
+  }
+
+  return typeof lines === 'function' ? arr(lines()) : arr(lines);
+}
 }

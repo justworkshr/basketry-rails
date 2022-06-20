@@ -19,7 +19,7 @@ module BasketryExample
         search: params['search']
       )
 
-      render json: map_gizmos_response_to_dto(response), status: response.errors.any? ? status_code(response.errors) : 200
+      render json: map_gizmos_response_to_dto(response), status: status_code(response.errors) || 200
     end
 
     def create_gizmo
@@ -27,7 +27,7 @@ module BasketryExample
         size: params['size']
       )
 
-      render json: map_gizmo_to_dto(response), status: response.errors.any? ? status_code(response.errors) : 201
+      render json: map_gizmo_to_dto(response), status: status_code(response.errors) || 201
     end
 
     def update_gizmo
@@ -35,7 +35,7 @@ module BasketryExample
         factors: params['factors']&.split(',')
       )
 
-      render json: map_gizmo_to_dto(response), status: response.errors.any? ? status_code(response.errors) : 200
+      render json: map_gizmo_to_dto(response), status: status_code(response.errors) || 200
     end
   end
 end

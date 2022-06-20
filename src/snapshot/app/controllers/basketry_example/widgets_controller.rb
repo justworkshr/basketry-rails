@@ -18,7 +18,7 @@ module BasketryExample
       response = services.widget_service.get_widgets(
       )
 
-      render json: map_widget_to_dto(response), status: response.errors.any? ? status_code(response.errors) : 200
+      render json: map_widget_to_dto(response), status: status_code(response.errors) || 200
     end
 
     def create_widget
@@ -26,14 +26,14 @@ module BasketryExample
         body: map_dto_to_create_widget_body(JSON.parse(request.body.read))
       )
 
-      render status: response.errors.any? ? status_code(response.errors) : 204
+      render status: status_code(response.errors) || 204
     end
 
     def put_widget
       response = services.widget_service.put_widget(
       )
 
-      render status: response.errors.any? ? status_code(response.errors) : 200
+      render status: status_code(response.errors) || 200
     end
 
     def get_widget_foo
@@ -41,7 +41,7 @@ module BasketryExample
         id: params['id']
       )
 
-      render json: map_widget_to_dto(response), status: response.errors.any? ? status_code(response.errors) : 200
+      render json: map_widget_to_dto(response), status: status_code(response.errors) || 200
     end
 
     def delete_widget_foo
@@ -49,7 +49,7 @@ module BasketryExample
         id: params['id']
       )
 
-      render status: response.errors.any? ? status_code(response.errors) : 204
+      render status: status_code(response.errors) || 204
     end
   end
 end

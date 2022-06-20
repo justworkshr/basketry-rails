@@ -27,7 +27,7 @@ module BasketryExample
         number_double: cast_double(params['number-double'])
       )
 
-      render status: response.errors.any? ? status_code(response.errors) : 204
+      render status: status_code(response.errors) || 204
     end
 
     def exhaustive_params
@@ -65,7 +65,7 @@ module BasketryExample
         body: map_dto_to_exhaustive_params_body(JSON.parse(request.body.read))
       )
 
-      render status: response.errors.any? ? status_code(response.errors) : 204
+      render status: status_code(response.errors) || 204
     end
   end
 end

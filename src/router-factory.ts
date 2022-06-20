@@ -431,7 +431,7 @@ class Builder {
             method.returnType.typeName.value,
           )}_to_dto(response), `
         : '';
-      yield `render ${json}status: response.errors.any? ? status_code(response.errors) : ${httpMethod.successCode.value}`;
+      yield `render ${json}status: status_code(response.errors) || ${httpMethod.successCode.value}`;
     });
   }
 
@@ -567,7 +567,7 @@ class Builder {
         yield 'def services';
         yield 'end';
         yield '';
-        yield `sig { abstract.params(errors: T::Array[${errorType}]).returns(Integer) }`;
+        yield `sig { abstract.params(errors: T::Array[${errorType}]).returns(T.nilable(Integer)) }`;
         yield 'def status_code(errors)';
         yield 'end';
       });

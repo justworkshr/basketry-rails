@@ -581,24 +581,27 @@ class Builder {
     yield '';
 
     yield* comment(function* () {
-      yield* block(`module TemplateBaseController`, function* () {
-        yield `extend T::Sig`;
-        yield '';
-        yield `include ${versionedModule}::${interfaceName}`;
-        yield '';
-        yield `sig { override.returns(${buildServiceLocatorNamespace(
-          self.service,
-          self.options,
-        )}::${buildServiceLocatorName()}) }`;
-        yield 'def services';
-        yield* indent('raise NotImplementedError');
-        yield 'end';
-        yield '';
-        yield `sig { override.params(errors: T::Array[${errorType}]).returns(Integer) }`;
-        yield 'def status_code(errors)';
-        yield* indent('raise NotImplementedError');
-        yield 'end';
-      });
+      yield* block(
+        `class BaseController < ApplicationController`,
+        function* () {
+          yield `extend T::Sig`;
+          yield '';
+          yield `include ${versionedModule}::${interfaceName}`;
+          yield '';
+          yield `sig { override.returns(${buildServiceLocatorNamespace(
+            self.service,
+            self.options,
+          )}::${buildServiceLocatorName()}) }`;
+          yield 'def services';
+          yield* indent('raise NotImplementedError');
+          yield 'end';
+          yield '';
+          yield `sig { override.params(errors: T::Array[${errorType}]).returns(T.nilable(Integer)) }`;
+          yield 'def status_code(errors)';
+          yield* indent('raise NotImplementedError');
+          yield 'end';
+        },
+      );
     });
 
     yield '';

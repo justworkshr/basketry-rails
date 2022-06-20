@@ -34,7 +34,7 @@ end
 # updated; however, your implementation will remain as-is. In such a case, you will need
 # to manually update your implementation to match the BaseControllerInterface interface.
 
-# module TemplateBaseController
+# class BaseController < ApplicationController
 #   extend T::Sig
 #
 #   include BasketryExample::BaseControllerInterface

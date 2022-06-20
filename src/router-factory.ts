@@ -545,7 +545,11 @@ class Builder {
       .filter((n): n is string => !!n);
 
     const errorType =
-      names.length === 1 ? names[0] : `T.any(${names.join(', ')})`;
+      names.length === 0
+        ? 'T.untyped'
+        : names.length === 1
+        ? names[0]
+        : `T.any(${names.join(', ')})`;
 
     const versionedModule = `${pascal(this.service.title.value)}${
       self.options?.sorbet?.includeVersion

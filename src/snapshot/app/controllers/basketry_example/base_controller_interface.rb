@@ -23,7 +23,7 @@ module BasketryExample
     def services
     end
 
-    sig { abstract.params(errors: T::Array[T.any()]).returns(T.nilable(Integer)) }
+    sig { abstract.params(errors: T::Array[T.untyped]).returns(T.nilable(Integer)) }
     def status_code(errors)
     end
   end
@@ -44,7 +44,7 @@ end
 #     raise NotImplementedError
 #   end
 #
-#   sig { override.params(errors: T::Array[T.any()]).returns(T.nilable(Integer)) }
+#   sig { override.params(errors: T::Array[T.untyped]).returns(T.nilable(Integer)) }
 #   def status_code(errors)
 #     raise NotImplementedError
 #   end

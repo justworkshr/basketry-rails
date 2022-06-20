@@ -11,7 +11,7 @@
 # About @basketry/rails: https://github.com/basketry/rails#readme
 
 module BasketryExample
-  class AuthPermutationsController < ActionController::Base
+  class AuthPermutationsController < ApplicationController
     include BasketryExample::ControllerHelpers
 
     def all_auth_schemes

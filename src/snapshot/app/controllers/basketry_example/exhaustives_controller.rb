@@ -11,7 +11,7 @@
 # About @basketry/rails: https://github.com/basketry/rails#readme
 
 module BasketryExample
-  class ExhaustivesController < ActionController::Base
+  class ExhaustivesController < ApplicationController
     include BasketryExample::ControllerHelpers
 
     def exhaustive_formats

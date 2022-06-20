@@ -11,7 +11,7 @@
 # About @basketry/rails: https://github.com/basketry/rails#readme
 
 module BasketryExample
-  class WidgetsController < ActionController::Base
+  class WidgetsController < ApplicationController
     include BasketryExample::ControllerHelpers
 
     def get_widgets

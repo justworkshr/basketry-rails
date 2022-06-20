@@ -387,7 +387,7 @@ class Builder {
     yield* block(`module ${versionedModule}`, function* () {
       yield* block(
         `class ${pascal(plural(int.name))}Controller < ${
-          self.options?.sorbet?.baseController || 'ActionController::Base'
+          self.options?.sorbet?.baseController || 'ApplicationController'
         }`,
         function* () {
           yield `include ${versionedModule}::ControllerHelpers`;

@@ -11,7 +11,7 @@
 # About @basketry/rails: https://github.com/basketry/rails#readme
 
 module BasketryExample
-  class GizmosController < ActionController::Base
+  class GizmosController < ApplicationController
     include BasketryExample::ControllerHelpers
 
     def get_gizmos

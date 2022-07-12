@@ -1,6 +1,6 @@
 {
   "name": "@basketry/rails",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Basketry generator for generating Rails routers and controllers",
   "main": "./lib/index.js",
   "scripts": {

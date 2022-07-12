@@ -23,7 +23,7 @@ module BasketryExample
 
     def create_widget
       response = services.widget_service.create_widget(
-        body: map_dto_to_create_widget_body(JSON.parse(request.body.read))
+        body: map_dto_to_create_widget_body(request.body.read.empty? ? nil : JSON.parse(request.body.read))
       )
 
       render status: status_code(response.errors) || 204

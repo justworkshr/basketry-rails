@@ -62,7 +62,7 @@ module BasketryExample
         header_number_array: cast_number_array(params['header-number-array']&.split('|')),
         header_integer_array: cast_integer_array(params['header-integer-array']&.split(' ')),
         header_boolean_array: cast_boolean_array(params['header-boolean-array']&.split('	')),
-        body: map_dto_to_exhaustive_params_body(JSON.parse(request.body.read))
+        body: map_dto_to_exhaustive_params_body(request.body.read.empty? ? nil : JSON.parse(request.body.read))
       )
 
       render status: status_code(response.errors) || 204

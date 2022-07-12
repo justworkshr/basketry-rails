@@ -445,15 +445,15 @@ class Builder {
 
     if (httpParam?.in.value === 'body') {
       const type = getTypeByName(this.service, param.typeName.value);
-      if (!type) return 'JSON.parse(request.body.read)';
+      if (!type) return 'request.body.read.empty? ? nil : JSON.parse(request.body.read)';
       if (param.isArray) {
-        return `JSON.parse(request.body.read).map { |item| map_dto_to_${snake(
+        return `request.body.read.empty? ? nil : JSON.parse(request.body.read).map { |item| map_dto_to_${snake(
           type.name.value,
         )}(item) }`;
       } else {
         return `map_dto_to_${snake(
           type.name.value,
-        )}(JSON.parse(request.body.read))`;
+        )}(request.body.read.empty? ? nil : JSON.parse(request.body.read))`;
       }
     }
 

@@ -19,7 +19,8 @@
     "fix:prettier": "prettier -w .",
     "clean:coverage": "rimraf coverage",
     "pretest": "run-s -s clean",
-    "prepack": "run-s -s build"
+    "prepack": "run-s -s build",
+    "prepare": "npm run build"
   },
   "keywords": [],
   "author": "Steve Konves",
@@ -49,7 +50,7 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "@basketry/sorbet": "^0.0.14",
+    "@basketry/sorbet": "github:justworkshr/basketry-sorbet",
     "basketry": "^0.0.25",
     "case": "^1.6.3",
     "pluralize": "^8.0.0",

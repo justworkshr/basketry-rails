@@ -32,6 +32,7 @@ import {
 } from '@basketry/sorbet/lib/name-factory';
 import { warning } from '@basketry/sorbet/lib/warning';
 import { RailsOptions } from './types';
+import { RailsFileTypes } from './enums';
 
 export const generateTypes: Generator = (service, options?: RailsOptions) => {
   return new Builder(service, options).build();
@@ -47,13 +48,30 @@ class Builder {
   private readonly castPrimitiveArray = new Set<Primitive>();
 
   build(): File[] {
+    const includeServiceController = !this.options?.basketry?.exclude?.includes(
+      RailsFileTypes.ServiceController,
+    );
+    const includeBaseControllerInterface =
+      !this.options?.basketry?.exclude?.includes(
+        RailsFileTypes.BaseControllerInterface,
+      );
+
     return [
       this.buildRouterFile(),
-      ...this.service.interfaces.map((int) => this.buildControllerFile(int)),
+      ...(includeServiceController
+        ? [
+            ...this.service.interfaces.map((int) =>
+              this.buildControllerFile(int),
+            ),
+          ]
+        : []),
       this.buildHelperFile(),
-      this.buildBaseControllerInterfaceFile(),
+      ...(includeBaseControllerInterface
+        ? [this.buildBaseControllerInterfaceFile()]
+        : []),
     ];
   }
+
   private buildRouterFile(): File {
     return {
       path: [
